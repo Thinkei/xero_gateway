@@ -16,7 +16,9 @@ module XeroGateway::Payroll
     attr_reader :errors
 
     attr_accessor :employee_id, :first_name, :date_of_birth, :email, :first_name, :gender, :last_name,
-                  :middle_name, :tax_file_number, :title
+                  :middle_name, :tax_file_number, :title,
+                  # Adding HomeAddress fields/elements
+                  :home_address
 
     def initialize(params = {})
       @errors ||= []
@@ -25,8 +27,9 @@ module XeroGateway::Payroll
       params.each do |k,v|
         self.send("#{k}=", v)
       end
-    end
 
+      # @home_address ||= {}
+    end
 
     # Validate the Employee record according to what will be valid by the gateway.
     #
@@ -89,6 +92,7 @@ module XeroGateway::Payroll
     def self.from_xml(employee_element, gateway = nil)
       employee = Employee.new
       employee_element.children.each do |element|
+        puts "#{element.name}"
         case(element.name)
         	when "EmployeeID" then employee.employee_id = element.text
           when "DateOfBirth" then employee.date_of_birth = element.text
@@ -99,13 +103,14 @@ module XeroGateway::Payroll
           when "MiddleNames" then employee.middle_name = element.text
           when "TaxFileNumber" then employee.tax_file_number = element.text
           when "Title" then employee.title = element.text
+          when "HomeAddress" then element.children.each { |home_address_element| employee.home_address["#{home_address_element.name}"] = home_address_element.text}
         end
       end
       employee
     end
 
     def ==(other)
-      [ :employee_id, :first_name, :date_of_birth, :email, :first_name, :gender, :last_name, :middle_name, :tax_file_number, :title ].each do |field|
+      [ :employee_id, :first_name, :date_of_birth, :email, :first_name, :gender, :last_name, :middle_name, :tax_file_number, :title, :home_address ].each do |field|
         return false if send(field) != other.send(field)
       end
       return true
