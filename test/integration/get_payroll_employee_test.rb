@@ -25,5 +25,11 @@ class GetPayrollEmployeeTest < Test::Unit::TestCase
     assert !result.response_xml.nil?
     assert_equal result.employee.first_name, employee.first_name
     assert_equal result.employee.last_name, employee.last_name
+    assert_equal result.employee.gender, employee.gender
+    assert_equal result.employee.email, employee.email
+    assert_equal result.employee.mobile, employee.mobile
+    assert_equal result.employee.phone, employee.phone
+    assert_equal result.employee.bank_accounts, employee.bank_accounts
+    assert_equal result.employee.pay_template, employee.pay_template
   end
 end
