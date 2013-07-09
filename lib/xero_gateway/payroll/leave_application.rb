@@ -20,7 +20,7 @@ module XeroGateway::Payroll
         self.send("#{k}=", v)
       end
       
-      @leave_periods = []
+      @leave_periods ||= []
     end
     
     def valid?

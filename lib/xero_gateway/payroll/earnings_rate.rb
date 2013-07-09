@@ -17,7 +17,7 @@ module XeroGateway::Payroll
     attr_reader :errors    
     
     attr_accessor :name, :account_code, :type_of_units, :is_exempt_from_tax, :is_exempt_from_super, :earnings_type, :earnings_rate_id,
-    :rate_type, :rate_per_unit, :multiplier, :accrue_leave, :amount
+    :rate_type, :rate_per_unit, :multiplier, :accrue_leave, :amount, :number_of_units
     
     def initialize(params = {})
       @errors ||= []
@@ -32,7 +32,7 @@ module XeroGateway::Payroll
       @errors = []
       
       if !earnings_rate_id.blank? && earnings_rate_id !~ GUID_REGEX
-        @errors << ['employee_id', 'invalid ID']
+        @errors << ['earnings_rate_id', 'invalid ID']
       end
       
       if name.blank?
@@ -76,6 +76,7 @@ module XeroGateway::Payroll
         b.Multiplier self.multiplier if self.multiplier
         b.AccrueLeave self.accrue_leave if self.accrue_leave
         b.Amount self.amount if self.amount
+        b.NumberOfUnits self.number_of_units if self.number_of_units
       }
     end 
     
@@ -94,7 +95,8 @@ module XeroGateway::Payroll
           when "RatePerUnit" then earnings_rate.rate_per_unit = element.text
           when "Multiplier" then earnings_rate.multiplier = element.text
           when "AccrueLeave" then earnings_rate.accrue_leave = element.text
-          when "Amount"then earnings_rate.amount = element.text
+          when "Amount" then earnings_rate.amount = element.text
+          when "NumberOfUnits" then earnings_rate.number_of_units = element.text
         end 
       end 
       earnings_rate
@@ -102,7 +104,7 @@ module XeroGateway::Payroll
    
     def ==(other)
      [ :name, :account_code, :type_of_units, :is_exempt_from_tax, :is_exempt_from_super, :earnings_type, :earnings_rate_id,
-    :rate_type, :rate_per_unit, :multiplier, :accrue_leave, :amount ].each do |field|
+    :rate_type, :rate_per_unit, :multiplier, :accrue_leave, :amount, :number_of_units ].each do |field|
         return false if send(field) != other.send(field)
       end
       return true
