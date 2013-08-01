@@ -39,7 +39,7 @@ class PayrollEmployeeTest < Test::Unit::TestCase
     employee.first_name = "EMPLOYEE FIRST NAME"
     employee.last_name = "EMPLOYEE LAST NAME"
 
-    home_address = XeroGateway::Payroll::HomeAddress.new 
+    home_address = XeroGateway::Payroll::HomeAddress.new
     home_address.address_line1 = "ADDRESS LINE 1"
     home_address.postal_code = "1234"
     home_address.city = "MyCity"

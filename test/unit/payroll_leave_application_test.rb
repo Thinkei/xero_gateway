@@ -57,11 +57,11 @@ class PayrollLeaveApplicationTest < Test::Unit::TestCase
                                                 :number_of_units => "3",
                                                 :pay_period_end_date => Date.today + 1.month,
                                                 :pay_period_start_date => Date.today,
-                                                :leave_period_status => "SCHEDULED")  
+                                                :leave_period_status => "SCHEDULED")
     leave_periods << leave_period
     leave_application.leave_periods = leave_periods
-    
-   
+
+
     leave_application
   end
 end
