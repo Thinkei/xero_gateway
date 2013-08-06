@@ -268,6 +268,41 @@ module XeroGateway
       get_payroll_super_fund(super_fund_id)
     end
 
+    def get_payroll_leave_applications(options={})
+      request_params = {}
+
+      request_params[:LeaveID]    = options[:leave_application_id] if options[:leave_application_id]
+      request_params[:Order]         = options[:order] if options[:order]
+      request_params[:ModifiedAfter] = options[:modified_since] if options[:modified_since]
+      request_params[:where]         = options[:where] if options[:where]
+      request_params[:page]          = options[:where] if options[:page]
+
+      response_xml = http_get(@client, "#{@xero_payroll_url}/LeaveApplications", request_params)
+
+      parse_response(response_xml, {:request_params => request_params}, {:request_signature => 'GET/leavepplications'}, true)
+    end
+
+    def get_payroll_leave_application_by_id(leave_application_id)
+      get_payroll_leave_application(leave_application_id)
+    end
+
+    def build_payroll_leave_application(leave_application = {})
+      case leave_application
+        when Payroll::LeaveApplication then   leave_application.gateway = self
+        when Hash             then   leave_application = Payroll::LeaveApplication.new(leave_application.merge({:gateway => self}))
+      end
+      leave_application
+    end
+
+    def create_payroll_leave_application(leave_application)
+      save_payroll_leave_application(leave_application)
+    end
+
+    def update_payroll_leave_application(leave_application)
+      raise "leave_application_id is required for updating payroll leave application" if leave_application.leave_application_id.nil?
+      save_payroll_leave_application(leave_application)
+    end
+
     # Retrieves all invoices from Xero
     #
     # Usage : get_invoices
@@ -685,6 +720,71 @@ module XeroGateway
       parse_response(response_xml, {:request_xml => request_xml}, {:request_signature => 'PUT/payments'})
     end
 
+    def get_payroll_pay_items
+      response_xml = http_get(@client, "#{@xero_payroll_url}/PayItems",{})
+
+      parse_response(response_xml, {:request_params => {}}, {:request_signature => 'GET/pay_items'}, true)
+    end
+
+    def get_payroll_payslip_by_id(payslip_id)
+      request_params = { :PayslipID => payslip_id }
+      response_xml = http_get(@client, "#{@xero_payroll_url}/Payslip/#{URI.escape(payslip_id)}", request_params)
+      
+      parse_response(response_xml, {:request_params => {}}, {:request_signature => 'GET/payslip'}, true)
+    end
+
+    def get_payroll_calendars(options= {})
+      request_params = {}
+
+      if !options[:updated_after].nil?
+        warn '[warning] :updated_after is depracated in XeroGateway#get_payroll_calendars.  Use :modified_since'
+        options[:modified_since] = options.delete(:updated_after)
+      end
+
+      request_params[:PayrollCalendarID]    = options[:payroll_calendar_id] if options[:payroll_calendar_id]
+      request_params[:order]       = options[:order] if options[:order]
+      request_params[:ModifiedAfter] = options[:modified_since] if options[:modified_since]
+      request_params[:Where]         = options[:where] if options[:where]
+      request_params[:page]         = options[:where] if options[:page]
+
+      response_xml = http_get(@client, "#{@xero_payroll_url}/PayrollCalendars", request_params)
+
+      parse_response(response_xml, {:request_params => request_params}, {:request_signature => 'GET/payroll_calendars'}, true)
+    end
+
+    def get_payroll_calendar_by_id(payroll_calendar_id = nil)
+      request_params = { :PayrollCalendarID => payroll_calendar_id }
+      response_xml = http_get(@client, "#{@xero_payroll_url}/PayrollCalendars/#{URI.escape(payroll_calendar_id)}", request_params)
+
+      parse_response(response_xml, {:request_params => request_params}, {:request_signature => 'GET/payroll_calendar'}, true)
+    end
+
+    def get_payroll_pay_runs(options= {})
+      request_params = {}
+
+      if !options[:updated_after].nil?
+        warn '[warning] :updated_after is depracated in XeroGateway#get_payroll_calendars.  Use :modified_since'
+        options[:modified_since] = options.delete(:updated_after)
+      end
+
+      request_params[:PayRunID]    = options[:pay_run_id] if options[:pay_run_id]
+      request_params[:order]       = options[:order] if options[:order]
+      request_params[:ModifiedAfter] = options[:modified_since] if options[:modified_since]
+      request_params[:Where]         = options[:where] if options[:where]
+      request_params[:page]         = options[:where] if options[:page]
+      
+      response_xml = http_get(@client, "#{@xero_payroll_url}/PayRuns", request_params)
+
+      parse_response(response_xml, {:request_params => request_params}, {:request_signature => 'GET/pay_runs'}, true)
+    end
+
+    def get_payroll_pay_run_by_id(pay_run_id = nil)
+      request_params = { :PayRunID => pay_run_id }
+      response_xml = http_get(@client, "#{@xero_payroll_url}/PayRun/#{URI.escape(pay_run_id)}", request_params)
+
+      parse_response(response_xml, {:request_params => request_params}, {:request_signature => 'GET/pay_run'}, true)
+    end
+
     private
 
     def get_contact(contact_id = nil, contact_number = nil)
@@ -715,6 +815,12 @@ module XeroGateway
       parse_response(response_xml, {:request_params => request_params}, {:request_signature => 'GET/superfund'}, true)
     end
 
+    def get_payroll_leave_application(leave_application_id = nil)
+      request_params = { :LeaveApplicationID => leave_application_id }
+      response_xml   = http_get(@client, "#{@xero_payroll_url}/LeaveApplications/#{URI.escape(leave_application_id)}", request_params)
+
+      parse_response(response_xml, {:request_params => request_params}, {:request_signature => 'GET/leavepplication'}, true)
+    end
     # Create or update a contact record based on if it has a contact_id or contact_number.
     def save_contact(contact)
       request_xml = contact.to_xml
@@ -762,6 +868,15 @@ module XeroGateway
       response = parse_response(response_xml, {:request_xml => request_xml}, {:request_signature => "POST/employee"}, true)
 
       employee.employee_id = response.employee.employee_id if response.employee && response.employee.employee_id
+      response
+    end
+
+    def save_payroll_leave_application(leave_application)
+      request_xml = leave_application.to_xml
+      response_xml = http_post(@client, "#{@xero_payroll_url}/LeaveApplications", request_xml, {})
+      response = parse_response(response_xml, {:request_xml => request_xml}, {:request_signature => "POST/leaveapplications"}, true)
+
+      leave_application.leave_application_id = response.response_item.leave_application_id if response.success?
       response
     end
 
@@ -899,6 +1014,11 @@ module XeroGateway
           when "Organisations" then response.response_item = Organisation.from_xml(element.children.first) # Xero only returns the Authorized Organisation
           when "TrackingCategories" then element.children.each {|child| response.response_item << TrackingCategory.from_xml(child) }
           when "SuperFunds" then element.children.each {|child| response.response_item << Payroll::SuperFund.from_xml(child, self) }
+          when "LeaveApplications" then element.children.each {|child| response.response_item << Payroll::LeaveApplication.from_xml(child, self)}
+          when "PayItems" then response.response_item = Payroll::PayItem.from_xml(element, self)
+          when "Payslip" then response.response_item = Payroll::Payslip.from_xml(element, self) 
+          when "PayrollCalendars" then element.children.each {|child| response.response_item << Payroll::PayrollCalendar.from_xml(child, self) }
+          when "PayRuns" then element.children.each {|child| response.response_item << Payroll::PayRun.from_xml(child, self) }
           when "Errors" then response.errors = element.children.map { |error| Error.parse(error) }
         end
       end if response_element
