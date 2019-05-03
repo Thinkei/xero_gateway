@@ -15,7 +15,7 @@ jobs:
           key: bundle-caches{{ checksum "gemspec" }}
           paths:
             - ~/xero_gateway/vendor/bundle
-      - run: bundle exec rake test
+      - run: rake test
   publish:
     docker:
       - image: ehdevops/ruby240:latest
@@ -31,12 +31,6 @@ jobs:
           key: bundle-caches{{ checksum "gemspec" }}
           paths:
             - ~/xero_gateway/vendor/bundle
-      - run: mkdir -p ./tmp/; mkdir -p ./tmp/cache
-      - run: mkdir -p ./tmp/employment-hero/config/
-      - run: echo -e "$PRIVATEKEY_PEM" > ./tmp/employment-hero/config/privatekey.pem
-      - run: echo -e "$ENTRUST_CERT_PEM" > ./tmp/employment-hero/config/entrust-cert.pem
-      - run: echo -e "$ENTRUST_PRIVATE_NOPASS_PEM" > ./tmp/employment-hero/config/entrust-private-nopass.pem
-      - run: bundle exec ruby scripts/publish.rb
 
 workflows:
   version: 2
