@@ -47,7 +47,7 @@ jobs:
           key: bundle-caches{{ checksum "app.json" }}
           paths:
             - vendor/bundle
-      - run: bundle exec ruby scripts/publish_staging.rb
+      - run: bundle exec ruby scripts/publish_staging.rb $CIRCLE_SHA1
 
 workflows:
   version: 2
