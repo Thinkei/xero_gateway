@@ -1,6 +1,5 @@
-require 'json'
-
-manifest_file = File.read(File.expand_path('../../app.json', __FILE__))
+manifest_file_path = File.expand_path('../app.json', __dir__)
+manifest_file = File.read(manifest_file_path)
 app = JSON.parse(manifest_file)
 
 commit = ARGV[0]
@@ -9,7 +8,7 @@ package_name = app['name']
 
 # Update back manifest file
 app['version'] = version
-File.open(manifest_file_path, "w") do |f|
+File.open(manifest_file_path, 'w') do |f|
   f.write(JSON.pretty_generate(app))
 end
 
