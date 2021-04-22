@@ -7,7 +7,7 @@ module OAuth
       end
     end
 
-    alias_method :ssl_client_certificates, :http
-    alias_method :http, :ssl_client_certificates
+    alias_method :http_without_ssl_client_certificates, :http
+    alias_method :http, :http_with_ssl_client_certificates
   end
 end
