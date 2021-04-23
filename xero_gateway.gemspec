@@ -20,4 +20,11 @@ Gem::Specification.new do |s|
   s.add_dependency('activemodel')
   s.add_dependency('retriable', '3.0.1')
   s.add_dependency('builder')
+
+  s.add_development_dependency('i18n')
+  s.add_development_dependency('test-unit')
+  s.add_development_dependency('libxml-ruby')
+  s.add_development_dependency('mocha', '~> 1.12.0')
+  s.add_development_dependency('shoulda')
+  s.add_development_dependency('rake')
 end
