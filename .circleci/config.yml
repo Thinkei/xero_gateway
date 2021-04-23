@@ -6,13 +6,14 @@ jobs:
     working_directory: ~/xero_gateway
     steps:
       - checkout
+      - run: cp *.gemspec gemspec
       - restore_cache:
           name: Restore Gem Dependencies from Cache
           keys:
-            - bundle-caches{{ checksum "Gemfile" }}
-      - run: bundle check || bundle install --jobs=4 --retry=3
+            - bundle-caches{{ checksum "gemspec" }}
+      - run: bundle check || bundle install --path=vendor/bundle --jobs=4 --retry=3
       - save_cache:
-          key: bundle-caches{{ checksum "Gemfile" }}
+          key: bundle-caches{{ checksum "gemspec" }}
           paths:
             - ~/xero_gateway/vendor/bundle
       - run: rake test
@@ -23,14 +24,11 @@ jobs:
     working_directory: ~/xero_gateway
     steps:
       - checkout
+      - run: cp *.gemspec gemspec
       - restore_cache:
           keys:
-            - bundle-caches{{ checksum "app.json" }}
-      - run: bundle check || bundle install --jobs=4 --retry=3
-      - save_cache:
-          key: bundle-caches{{ checksum "app.json" }}
-          paths:
-            - ~/xero_gateway/vendor/bundle
+            - bundle-caches{{ checksum "gemspec" }}
+      - run: bundle check || bundle install --path=vendor/bundle --jobs=4 --retry=3
       - run: bundle exec ruby scripts/publish.rb
 
   publish_staging:
@@ -39,14 +37,11 @@ jobs:
     working_directory: ~/xero_gateway
     steps:
       - checkout
+      - run: cp *.gemspec gemspec
       - restore_cache:
           keys:
-            - bundle-caches{{ checksum "app.json" }}
+            - bundle-caches{{ checksum "gemspec" }}
       - run: bundle check || bundle install --path=vendor/bundle --jobs=4 --retry=3
-      - save_cache:
-          key: bundle-caches{{ checksum "app.json" }}
-          paths:
-            - vendor/bundle
       - run: bundle exec ruby scripts/publish_staging.rb $CIRCLE_SHA1
 
 workflows:
