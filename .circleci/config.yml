@@ -16,7 +16,7 @@ jobs:
           key: bundle-caches{{ checksum "gemspec" }}
           paths:
             - ~/xero_gateway/vendor/bundle
-      - run: rake test
+      - run: bundle exec rake test
 
   publish:
     docker:
