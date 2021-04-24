@@ -13,7 +13,6 @@ Gem::Specification.new do |s|
   s.email    = "dave@thinkei.com"
   s.homepage = "http://github.com/Thinkei/xero_gateway"
   s.description = "Includes the ability to update Xero payroll data"
-  s.has_rdoc = false
   s.authors  = ["Tim Connor", "Nik Wakelin", "ThinkEI"]
   s.files = ["Gemfile", "LICENSE", "Rakefile", "README.textile", "xero_gateway.gemspec"] + Dir['**/*.rb'] + Dir['**/*.crt']
   s.add_dependency('oauth', '~> 0.4.0')
@@ -21,4 +20,11 @@ Gem::Specification.new do |s|
   s.add_dependency('activemodel')
   s.add_dependency('retriable', '3.0.1')
   s.add_dependency('builder')
+
+  s.add_development_dependency('i18n')
+  s.add_development_dependency('test-unit')
+  s.add_development_dependency('libxml-ruby')
+  s.add_development_dependency('mocha', '~> 1.12.0')
+  s.add_development_dependency('shoulda')
+  s.add_development_dependency('rake')
 end
